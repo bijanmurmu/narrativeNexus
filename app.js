@@ -153,7 +153,9 @@ app.post("/compose", async (req, res) => {
         
         await newBlog.save();  // Wait for the save operation to complete
         console.log("Blog saved:", newBlog.toJSON());
-        res.redirect("/")
+        // res.redirect("/")
+        const blogs = await Blog.find({}); // Fetch all documents from the Blog collection
+        res.render("last", {blogs : blogs}); 
     } catch (error) {
         console.error("Error saving blog:", error);
         res.status(500).send("Error saving blog post");
