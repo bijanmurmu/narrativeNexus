@@ -191,14 +191,14 @@ app.post("/login", async (req, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(400).send("User not found");
+            return res.status(400).send("User or password not found");
         }
 
         // Compare password with the hashed password
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
-            return res.status(400).send("Invalid password");
+            return res.status(400).send("User or password not found");
         }
 
         // Successful login, And show Blogs:
