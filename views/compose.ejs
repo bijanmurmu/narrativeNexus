@@ -67,6 +67,33 @@
             transform: translateY(-3px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
+        
+        .file-input-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .file-input-container input[type="file"] {
+            display: none;
+        }
+        
+        .file-label {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .file-label:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        
         @keyframes fadeIn {
             to {
                 opacity: 1;
@@ -78,8 +105,12 @@
 <body>
     <div class="container">
         <h1>Compose Your Blog</h1>
-        <form action="/compose" method="post">
-            <textarea name="blogText" placeholder="Write your blog post here..."></textarea>            
+        <form action="/compose" method="post" enctype="multipart/form-data">
+            <textarea name="blogText" placeholder="Write your blog post here..."></textarea>
+            <div class="file-input-container">
+                <input type="file" name="blogImage" accept="image/*" id="imageInput">
+                <label for="imageInput" class="file-label">Choose Image</label>
+            </div>
             <button type="submit">Publish</button>
         </form>
     </div>
@@ -90,6 +121,14 @@
         });
         document.querySelector('textarea').addEventListener('blur', function() {
             this.style.transform = 'scale(1)';
+        });
+        
+        // Show selected filename
+        document.getElementById('imageInput').addEventListener('change', function() {
+            const fileName = this.files[0]?.name;
+            if (fileName) {
+                this.nextElementSibling.textContent = fileName;
+            }
         });
     </script>
 </body>

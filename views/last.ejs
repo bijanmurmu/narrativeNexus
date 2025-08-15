@@ -75,6 +75,26 @@
             line-height: 1.8;
             font-size: 1.1em;
         }
+        
+        .blog-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-top: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .blog-image:hover {
+            transform: scale(1.02);
+        }
+        
+        .blog-meta {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 10px;
+            font-style: italic;
+        }
 
         .no-posts {
             text-align: center;
@@ -140,12 +160,16 @@
             <% blogs.forEach(function(blog, index) { %>
                 <div class="blog-post" style="animation-delay: <%= index * 0.1 %>s;">
                     <% if ( blog.by ) { %>
-                        <p>Narrated: <%= String(blog.by) %></p>
+                        <p class="blog-meta">Narrated: <%= String(blog.by) %></p>
                     <% } %>
                     <p>Nexus: <%= blog.data %></p>
                     <% if (  blog.createdAt ) { %>
-                        <p>Time Of Narration: <%= String(blog.createdAt).slice(0, 24) %></p>
+                        <p class="blog-meta">Time Of Narration: <%= String(blog.createdAt).slice(0, 24) %></p>
                     <% } %>
+                    <% if (blog.imageUrl) { %>
+                        <img src="<%= blog.imageUrl %>" alt="Blog Image" class="blog-image">
+                    <% } %>
+
                 </div>
             <% }); %>
         <% } else { %>
