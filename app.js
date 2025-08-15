@@ -9,10 +9,17 @@ const multer = require("multer");
 // const { v2: cloudinary } = require("cloudinary");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const session = require("express-session");
 
 const app = express();
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
+// Setup session
+app.use(session({
+    secret: process.env.SESSION_SECRET || "mysecretkey",
+    resave: false,
+    saveUninitialized: true,
+}));
 
 // MongoDB database:
 // Connection
@@ -91,7 +98,7 @@ const uploadToCloudinary = async (fileBuffer, fileName) => {
         // Convert buffer to base64 string
         const base64String = fileBuffer.toString('base64');
         const dataURI = `data:image/jpeg;base64,${base64String}`;
-        
+
         const uploadResult = await cloudinary.uploader.upload(dataURI, {
             public_id: fileName,
             folder: "narrative_nexus",
@@ -180,7 +187,7 @@ app.post("/register", async (req, res) => {
     }
 });
 
-var email = "";
+// var email = "";
 
 app.post("/login", async (req, res) => {
     email = req.body.email;
@@ -194,6 +201,7 @@ app.post("/login", async (req, res) => {
             return res.status(400).send("User or password not found");
         }
 
+        req.session.email = email;
         // Compare password with the hashed password
         const isMatch = await bcrypt.compare(password, user.password);
 
@@ -215,6 +223,8 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/compose", upload.single('blogImage'), async (req, res) => {
+    if (!req.session.email) return res.redirect("/login");
+
     const text = req.body.blogText;
     const imageFile = req.file; // Changed from req.blogImage to req.file
     let imageUrl = null;
@@ -240,14 +250,14 @@ app.post("/compose", upload.single('blogImage'), async (req, res) => {
     try {
         // Create a new Blog document
         const newBlog = new Blog({
-            by: email,
+            by: req.session.email,
             data: text, // Use 'data' instead of 'text' to match the schema
             imageUrl: imageUrl,
         });
 
         await newBlog.save(); // Wait for the save operation to complete
         console.log("Blog saved:", newBlog.toJSON());
-        
+
         // Fetch updated blogs and render
         const blogs = await Blog.find({}).sort({ createdAt: -1 }); // Sort by newest first
         res.render("last", { blogs: blogs });
