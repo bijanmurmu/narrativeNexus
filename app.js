@@ -13,6 +13,7 @@ const session = require("express-session");
 
 const app = express();
 app.set("view engine", "ejs");
+app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 // Setup session
 app.use(
