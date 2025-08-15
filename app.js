@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs'); // for hashing passwords
-
+require("dotenv").config();
 
 const app = express();
 app.set('view engine', 'ejs');
@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // MongoDB database:
 // Connection
-mongoose.connect('mongodb+srv://admin-bimbok:bimbok123@cluster0.1w1cxot.mongodb.net/kiHobe')
+mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
         console.log("Connected to MongoDB");
     })
