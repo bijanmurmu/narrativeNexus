@@ -15,11 +15,26 @@ const app = express();
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 // Setup session
-app.use(session({
-    secret: process.env.SESSION_SECRET || "mysecretkey",
-    resave: false,
-    saveUninitialized: true,
-}));
+app.use(
+    session({
+        secret:
+            process.env.SESSION_SECRET ||
+            "your-very-secure-secret-key-change-this-in-production",
+        resave: false,
+        saveUninitialized: false, // Changed to false for better security
+        name: "blogapp.sid", // Custom session name
+        cookie: {
+            secure: false, // Set to true in production with HTTPS
+            httpOnly: true, // Prevents XSS attacks
+            maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        },
+        // For production, add MongoDB session store:
+        // store: MongoStore.create({
+        //     mongoUrl: process.env.MONGODB_URI,
+        //     touchAfter: 24 * 3600 // lazy session update
+        // })
+    })
+);
 
 // MongoDB database:
 // Connection
@@ -201,13 +216,14 @@ app.post("/login", async (req, res) => {
             return res.status(400).send("User or password not found");
         }
 
-        req.session.email = email;
         // Compare password with the hashed password
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
             return res.status(400).send("User or password not found");
         }
+
+        req.session.email = email;
 
         // Successful login, And show Blogs:
         try {
@@ -223,6 +239,7 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/compose", upload.single('blogImage'), async (req, res) => {
+
     if (!req.session.email) return res.redirect("/login");
 
     const text = req.body.blogText;
@@ -231,13 +248,8 @@ app.post("/compose", upload.single('blogImage'), async (req, res) => {
 
     if (imageFile) {
         try {
-            const fileName = `blog_${Date.now()}_${Math.round(
-                Math.random() * 1e9
-            )}`;
-            const uploadResult = await uploadToCloudinary(
-                imageFile.buffer,
-                fileName
-            );
+            const fileName = `blog_${Date.now()}_${Math.round(Math.random() * 1e9)}`;
+            const uploadResult = await uploadToCloudinary(imageFile.buffer, fileName);
             imageUrl = uploadResult.secure_url;
             console.log("Image uploaded successfully:", imageUrl);
         } catch (uploadError) {
