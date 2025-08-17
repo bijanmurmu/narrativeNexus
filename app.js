@@ -164,16 +164,18 @@ app.get("/compose", (req, res) => {
     res.render("compose");
 });
 
-app.get("/you", async (req, res) =>  {
+app.get("/you", async (req, res) => {
     if (!req.session.email) return res.redirect("/login");
-    
+
     try {
-        const blogs = await Blog.find({by: req.session.email}).sort({ createdAt: -1 }); // Sort by newest first
-        res.render("last", { blogs: blogs }); // Send the to last.ejs
+        const blogs = await Blog.find({ by: req.session.email }).sort({ createdAt: -1 }); // Sort by newest first
+        res.render("last", { blogs: blogs, currentUser: req.session.email, flag: true }); // Send the to last.ejs
     } catch (error) {
         res.status(500).send("Error fetching blog texts");
     }
 });
+
+
 
 app.get("/expMore", (req, res) => {
     res.render("learnMore");
@@ -245,7 +247,7 @@ app.post("/login", async (req, res) => {
         // Successful login, And show Blogs:
         try {
             const blogs = await Blog.find({}).sort({ createdAt: -1 }); // Sort by newest first
-            res.render("last", { blogs: blogs }); // Send the to last.ejs
+            res.render("last", { blogs: blogs, currentUser: req.session.email, flag: false }); // Send the to last.ejs
         } catch (error) {
             res.status(500).send("Error fetching blog texts");
         }
@@ -289,12 +291,58 @@ app.post("/compose", upload.single('blogImage'), async (req, res) => {
 
         // Fetch updated blogs and render
         const blogs = await Blog.find({}).sort({ createdAt: -1 }); // Sort by newest first
-        res.render("last", { blogs: blogs });
+        res.render("last", { blogs: blogs, currentUser: req.session.email, flag: false});
     } catch (error) {
         console.error("Error saving blog:", error);
         res.status(500).send("Error saving blog post");
     }
 });
+
+app.post("/delete/:id", async (req, res) => {
+    if (!req.session.email) return res.status(401).send("Unauthorized");
+
+    try {
+        // Find the blog by ID
+        const blog = await Blog.findById(req.params.id);
+
+        if (!blog) {
+            return res.status(404).send("Blog not found");
+        }
+
+        // Check if current user is the owner
+        if (blog.by !== req.session.email) {
+            return res
+                .status(403)
+                .send("Forbidden: You can only delete your own posts");
+        }
+
+        // If the blog has an image, delete it from Cloudinary
+        if (blog.imageUrl) {
+            try {
+                // Extract public_id from the Cloudinary URL
+                const publicId = blog.imageUrl
+                    .split("/")
+                    .slice(-2) // last 2 parts = folder + filename.ext
+                    .join("/")
+                    .split(".")[0]; // remove file extension
+
+                await cloudinary.uploader.destroy(publicId);
+                console.log("Deleted from Cloudinary:", publicId);
+            } catch (cloudErr) {
+                console.error("Cloudinary delete error:", cloudErr);
+            }
+        }
+
+        // Delete the blog from MongoDB
+        await Blog.findByIdAndDelete(req.params.id);
+
+        res.redirect("/you"); // After deletion, redirect to "your posts" page
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error deleting blog");
+    }
+});
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

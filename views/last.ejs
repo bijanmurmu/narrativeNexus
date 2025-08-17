@@ -125,6 +125,26 @@
             transform: scale(1.05);
         }
 
+        .delete-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .delete-btn:hover {
+            background-color: #ff3742;
+            transform: scale(1.05);
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
@@ -160,7 +180,7 @@
         <h1>Posted Narrative Nexus</h1>
         <% if (blogs.length > 0) { %>
             <% blogs.forEach(function(blog, index) { %>
-                <div class="blog-post" style="animation-delay: <%= index * 0.1 %>s;">
+                <div class="blog-post" style="animation-delay: <%= index * 0.1 %>s;" data-post-id="<%= blog._id %>">
                     <% if ( blog.by ) { %>
                         <p class="blog-meta">Narrated: <%= String(blog.by) %></p>
                     <% } %>
@@ -171,7 +191,13 @@
                     <% if (blog.imageUrl) { %>
                         <img src="<%= blog.imageUrl %>" alt="Blog Image" class="blog-image">
                     <% } %>
-
+                    <% if (flag) { %>
+                        <% if (blog.by===currentUser) { %>
+                            <form action="/delete/<%= blog._id %>" method="POST" style="display:inline;">
+                                <button class="delete-btn" type="submit">Delete</button>
+                            </form>
+                        <% } %>
+                    <% } %>
                 </div>
             <% }); %>
         <% } else { %>
