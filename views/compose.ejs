@@ -7,6 +7,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="shortcut icon" href="logo.ico" type="image/x-icon">
     <style>
+        :root {
+            --accent-color: #ff6b6b;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -101,9 +105,32 @@
                 transform: translateY(0);
             }
         }
+
+        .you {
+            display: inline-block;
+            position: fixed;
+            z-index: 10;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: var(--accent-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .you:hover {
+            background-color: #ff4757;
+            transform: scale(1.05);
+        }
+
     </style>
 </head>
 <body>
+    <a href="/you" class="you">Your Posts</a>
     <div class="container">
         <h1>Compose Your Blog</h1>
         <form action="/compose" method="post" enctype="multipart/form-data">

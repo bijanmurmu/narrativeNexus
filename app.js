@@ -11,6 +11,7 @@ const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const session = require("express-session");
 const path = require("path");
+const { equal } = require("assert");
 
 const app = express();
 app.set("views", path.join(__dirname, "views"));
@@ -161,6 +162,17 @@ app.get("/register", (req, res) => {
 
 app.get("/compose", (req, res) => {
     res.render("compose");
+});
+
+app.get("/you", async (req, res) =>  {
+    if (!req.session.email) return res.redirect("/login");
+    
+    try {
+        const blogs = await Blog.find({by: req.session.email}).sort({ createdAt: -1 }); // Sort by newest first
+        res.render("last", { blogs: blogs }); // Send the to last.ejs
+    } catch (error) {
+        res.status(500).send("Error fetching blog texts");
+    }
 });
 
 app.get("/expMore", (req, res) => {
