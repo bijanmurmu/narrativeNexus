@@ -148,8 +148,20 @@ function generateSlug(title) {
 }
 
 // Get Requests
-app.get("/", (req, res) => {
-    res.render("index");
+// Get Requests
+app.get("/", async (req, res) => {
+    try {
+        // Get 2 random blog posts
+        const randomPosts = await Blog.aggregate([
+            { $sample: { size: 2 } }
+        ]);
+        
+        res.render("index", { randomPosts: randomPosts });
+    } catch (error) {
+        console.error("Error fetching random posts:", error);
+        // If there's an error, render without posts
+        res.render("index", { randomPosts: [] });
+    }
 });
 
 app.get("/login", (req, res) => {

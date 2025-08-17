@@ -223,6 +223,47 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
+
+                .random-posts {
+            margin: 2rem 0;
+        }
+
+        .post-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--secondary-color);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .post-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            font-style: italic;
+        }
+
+        .post-author {
+            color: var(--primary-color);
+            font-weight: 600;
+            text-align: right;
+            margin-bottom: 1rem;
+        }
+
+        .post-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -247,14 +288,27 @@
         </section>
 
         <section id="about">
-            <h2>My Story</h2>
-            <p>Bimbok Mukherjee is the visionary creator behind Narrative Nexus, a passionate student pursuing a B.Tech in Information Technology. At just 20 years old, Bimbok has already made significant strides in the world of web development.</p>
-            <p>Born and raised in Kolkata, India, Bimbok discovered his love for coding at a young age. His journey began with simple HTML websites and quickly evolved into complex web applications. Bimbok's insatiable curiosity and dedication to learning have been the driving forces behind his rapid growth in the tech world.</p>
-            <p>As a firm believer in the power of open-source software, Bimbok actively contributes to various GitHub projects. His commitment to sharing knowledge and collaborating with fellow developers has earned him respect within the coding community.</p>
-            <p>Bimbok's expertise lies in full-stack development, with a particular focus on secure and scalable web applications. His proficiency in languages such as JavaScript, Python, and Java, coupled with his understanding of modern frameworks like React and Node.js, allows him to bring innovative ideas to life.</p>
-            <p>Beyond coding, Bimbok is an advocate for digital privacy and security. This passion led to the creation of Narrative Nexus, a platform that combines the art of storytelling with state-of-the-art encryption techniques. His goal is to provide a safe space for individuals to express themselves freely online.</p>
-            <p>When not immersed in lines of code, Bimbok enjoys exploring the latest tech trends, participating in hackathons, and mentoring aspiring developers. He dreams of leveraging technology to make a positive impact on society and inspire the next generation of innovators.</p>
-            <p>Through Narrative Nexus, Bimbok aims to revolutionize the way we share stories online, proving that with determination and creativity, even a student can make waves in the tech industry.</p>
+            <h2>Some Nexus</h2>
+                <% if (randomPosts && randomPosts.length> 0) { %>
+                    <div class="random-posts">
+                        <% randomPosts.forEach(function(post) { %>
+                            <div class="post-card">
+                                <div class="post-content">
+                                    <p class="post-text">
+                                        <%= post.data %>
+                                    </p>
+                                    <p class="post-author">- <%= post.by %>
+                                    </p>
+                                    <% if (post.imageUrl) { %>
+                                        <img src="<%= post.imageUrl %>" alt="Post Image" class="post-image">
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <p>No posts available at the moment.</p>
+                <% } %>
             <a href="aboutMe" class="btn">About Bimbok</a>
         </section>
 
